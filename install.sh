@@ -4,27 +4,38 @@ DOTFILES="$HOME/dotfiles"
 
 echo "🚀 開始安裝 dotfiles..."
 
-# 建立 .config 資料夾
-mkdir -p ~/.config
-
-# Starship
-ln -sf "$DOTFILES/starship.toml" ~/.config/starship.toml
-echo "✅ Starship 設定完成"
-
-# tmux
-ln -sf "$DOTFILES/.tmux.conf" ~/.tmux.conf
-echo "✅ tmux 設定完成"
-
-# 安裝 Starship（若尚未安裝）
+# 1. 安裝 Starship
 if ! command -v starship &> /dev/null; then
     echo "📦 安裝 Starship..."
     curl -sS https://starship.rs/install.sh | sh
 fi
 
-# 加入 starship 啟動（若 .zshrc 裡還沒有）
-if ! grep -q "starship init" ~/.zshrc; then
-    echo 'eval "$(starship init zsh)"' >> ~/.zshrc
-    echo "✅ .zshrc 設定完成"
-fi
+# 2. 建立設定目錄
+mkdir -p ~/.config
+mkdir -p ~/.zsh
 
-echo "🎉 全部完成！請執行 source ~/.zshrc"
+# 3. Starship 設定
+ln -sf "$DOTFILES/starship.toml" ~/.config/starship.toml
+echo "✅ Starship 設定完成"
+
+# 4. tmux 設定
+ln -sf "$DOTFILES/.tmux.conf" ~/.tmux.conf
+echo "✅ tmux 設定完成"
+
+# 5. zshrc 設定
+ln -sf "$DOTFILES/.zshrc" ~/.zshrc
+echo "✅ .zshrc 設定完成"
+
+# 6. 安裝 zsh plugins
+if [ ! -d ~/.zsh/zsh-autosuggestions ]; then
+    git clone https://github.com/zsh-users/zsh-autosuggestions ~/.zsh/zsh-autosuggestions
+fi
+if [ ! -d ~/.zsh/zsh-syntax-highlighting ]; then
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting ~/.zsh/zsh-syntax-highlighting
+fi
+if [ ! -d ~/.zsh/zsh-z ]; then
+    git clone https://github.com/agkozak/zsh-z ~/.zsh/zsh-z
+fi
+echo "✅ Plugins 安裝完成"
+
+echo "🎉 全部完成！請執行 exec zsh"
