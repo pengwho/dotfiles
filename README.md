@@ -1,122 +1,79 @@
 # dotfiles
 
-跨平台終端機環境設定，適用於 macOS / Linux / Windows (WSL)。
+跨平台終端機環境設定，適用於 macOS / Linux。
+包含 Starship 提示字元、tmux、zsh plugins。
 
-包含 Starship 提示字元主題與 tmux 設定，SSH 連線到任何機器都能保持一致的外觀。
+## 環境需求
 
----
+- zsh
+- git
+- curl
 
-## 包含的設定檔
-
-| 檔案 | 說明 |
-|---|---|
-| `starship.toml` | Starship 提示字元主題設定 |
-| `.tmux.conf` | tmux 顏色與狀態列設定 |
-| `install.sh` | 自動安裝腳本 |
-
----
-
-## 新機器安裝 SOP
-
-### Step 1：安裝 Starship
-
-```bash
-curl -sS https://starship.rs/install.sh | sh
-```
-
-### Step 2：Clone 這個 repo
+## 安裝
 
 ```bash
 git clone git@github.com:pengwho/dotfiles.git ~/dotfiles
-```
-
-### Step 3：執行安裝腳本
-
-```bash
 ~/dotfiles/install.sh
+exec zsh
 ```
 
-### Step 4：重新載入 shell
+## 檔案說明
+
+| 檔案 | 說明 |
+|---|---|
+| `install.sh` | 一鍵安裝腳本 |
+| `.zshrc` | zsh 設定，載入 plugins 和 Starship |
+| `starship.toml` | Starship 提示字元設定 |
+| `.tmux.conf` | tmux 顏色與狀態列設定 |
+
+## install.sh 做了什麼
+
+1. 安裝 Starship（若尚未安裝）
+2. 建立 symlink：`starship.toml` → `~/.config/starship.toml`
+3. 建立 symlink：`.tmux.conf` → `~/.tmux.conf`
+4. 建立 symlink：`.zshrc` → `~/.zshrc`
+5. 安裝 zsh plugins：
+   - `zsh-autosuggestions`（輸入建議）
+   - `zsh-syntax-highlighting`（語法顏色）
+   - `zsh-z`（快速跳目錄）
+
+## 新機器 SSH 連 GitHub 設定
 
 ```bash
-source ~/.zshrc   # zsh
-source ~/.bashrc  # bash
-```
+# 產生金鑰
+ssh-keygen -t ed25519 -C "機器名稱"
 
----
-
-## 手動安裝
-
-### Starship
-
-```bash
-mkdir -p ~/.config
-ln -sf ~/dotfiles/starship.toml ~/.config/starship.toml
-echo 'eval "$(starship init zsh)"' >> ~/.zshrc
-source ~/.zshrc
-```
-
-### tmux
-
-```bash
-ln -sf ~/dotfiles/.tmux.conf ~/.tmux.conf
-tmux source-file ~/.tmux.conf
-```
-
----
-
-## SSH 連接 GitHub 設定
-
-### 產生金鑰
-
-```bash
-ssh-keygen -t ed25519 -C "你的機器名稱"
-```
-
-### 複製公鑰
-
-```bash
+# 複製公鑰
 cat ~/.ssh/id_ed25519.pub
-```
 
-前往 https://github.com/settings/ssh/new 貼上公鑰並儲存。
+# 貼到 GitHub
+# https://github.com/settings/ssh/new
 
-### 測試連線
-
-```bash
+# 測試
 ssh -T git@github.com
-```
 
----
+# 把 remote 改成 SSH
+git remote set-url origin git@github.com:pengwho/dotfiles.git
+```
 
 ## 更新設定
 
 ```bash
+# 修改設定後同步
 cd ~/dotfiles
 git add .
-git commit -m "update: 說明修改內容"
+git commit -m "update: 說明"
 git push
-```
 
-其他機器拉取：
-
-```bash
+# 其他機器拉取
 cd ~/dotfiles
 git pull
+exec zsh
 ```
 
----
+## 注意事項
 
-## 常見問題
-
-**Q：提示字元出現亂碼？**
-執行 `starship preset no-nerd-font -o ~/.config/starship.toml` 改用無字體版本。
-
-**Q：tmux 顏色跑掉？**
-先 `exit` 退出，再 `tmux` 重新進入。
-
-**Q：install.sh 沒有執行權限？**
-
-```bash
-chmod +x ~/dotfiles/install.sh
-```
+- 不依賴 Oh My Zsh，避免與 Starship 衝突
+- Starship 設定中 `show_always = true` 讓使用者名稱永遠顯示
+- 字體使用 emoji，不需要安裝 Nerd Font
+- tmux 如果顏色異常，exit 後重新開啟即可
