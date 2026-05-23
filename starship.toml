@@ -1374,7 +1374,7 @@ detect_env_vars = []
 format = "[$user]($style) in "
 style_root = "red bold"
 style_user = "yellow bold"
-show_always = false
+show_always = true
 disabled = false
 
 [username.aliases]
